@@ -2,17 +2,21 @@ package com.devsm.ecommerce.domain.auth.service;
 
 import com.devsm.ecommerce.domain.auth.dto.request.SignInRequestDto;
 import com.devsm.ecommerce.domain.auth.dto.request.SignUpRequestDto;
-import com.devsm.ecommerce.domain.auth.dto.response.SignInResponseDto;
-import com.devsm.ecommerce.domain.auth.dto.response.SignUpResponseDto;
+import com.devsm.ecommerce.domain.auth.dto.response.SignInResponse;
+import com.devsm.ecommerce.domain.auth.exception.AuthException;
 import com.devsm.ecommerce.domain.user.entity.Role;
 import com.devsm.ecommerce.domain.user.entity.User;
 import com.devsm.ecommerce.domain.user.repository.UserRepository;
 import com.devsm.ecommerce.global.jwt.JwtProvider;
 import com.devsm.ecommerce.global.response.ResponseDto;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,55 +28,48 @@ public class AuthService {
 
 
     // 회원가입
-    public ResponseEntity<? super SignUpResponseDto> signUp (SignUpRequestDto dto) {
-        try {
-            String email = dto.getEmail();
-            if (userRepository.existsByEmail(email)) return SignUpResponseDto.duplicateEmail();
+    public ResponseDto<Long> signUp(SignUpRequestDto dto) {
 
-            String phoneNumber = dto.getPhoneNumber();
-            if(userRepository.existsByPhoneNumber(phoneNumber)) return SignUpResponseDto.duplicatePhoneNumber();
+        String email = dto.getEmail();
+        if (userRepository.existsByEmail(email)) throw new AuthException.DuplicateEmailException();
 
-            String password = dto.getPassword();
-            dto.setPassword(bCryptPasswordEncoder.encode(password));
-            userRepository.save(User.builder()
-                            .email(dto.getEmail())
-                            .password(dto.getPassword())
-                            .username(dto.getUsername())
-                            .phoneNumber(dto.getPhoneNumber())
-                            .address(dto.getAddress())
-                            .role(Role.ROLE_USER)
-                    .build());
-        }
-        catch (Exception e) {
-            return ResponseDto.databaseError();
-        }
-        return SignUpResponseDto.success();
+        String phoneNumber = dto.getPhoneNumber();
+        if (userRepository.existsByPhoneNumber(phoneNumber)) throw new AuthException.DuplicatePhoneNumberException();
+
+        String password = dto.getPassword();
+        dto.setPassword(bCryptPasswordEncoder.encode(password));
+
+        User user = userRepository.save(User.builder()
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .username(dto.getUsername())
+                .phoneNumber(dto.getPhoneNumber())
+                .address(dto.getAddress())
+                .uuid(UUID.randomUUID().toString())
+                .role(Role.ROLE_USER)
+                .build());
+
+        return ResponseDto.success(user.getId());
     }
 
-     // 로그인
-    public ResponseEntity<? super SignInResponseDto> signIn(SignInRequestDto dto) {
+    // 로그인
+    public ResponseDto<SignInResponse> signIn(SignInRequestDto dto) {
 
-            String token = null;
-            try {
-                String email = dto.getEmail();
+        String token = null;
 
-                User user = userRepository.findByEmail(email);
-                if (user == null) return SignInResponseDto.signInFailed();
+        String email = dto.getEmail();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("이메일 또는 비밀번호가 다릅니다."));
 
-                String password = dto.getPassword();
-                String encodedPassword = user.getPassword();
-                boolean isMatched = bCryptPasswordEncoder.matches(password, encodedPassword);
-                if (!isMatched) return SignInResponseDto.signInFailed();
+        String password = dto.getPassword();
+        String encodedPassword = user.getPassword();
+        boolean isMatched = bCryptPasswordEncoder.matches(password, encodedPassword);
+        if (!isMatched) throw new EntityNotFoundException("이메일 또는 비밀번호가 다릅니다.");
 
-                String role = user.getRole().toString();
+        String role = user.getRole().toString();
+        String uuid = user.getUuid();
+        token = jwtProvider.create(email,uuid, role, 360000L);
 
-                token = jwtProvider.create(email,role,3600);
-
-            } catch (Exception e){
-                return ResponseDto.databaseError();
-            }
-
-
-            return SignInResponseDto.success(token);
+        return ResponseDto.success(new SignInResponse(token));
     }
+
 }

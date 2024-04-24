@@ -1,12 +1,13 @@
 package com.devsm.ecommerce.domain.auth.controller;
 
 import com.devsm.ecommerce.domain.auth.dto.request.SignInRequestDto;
-import com.devsm.ecommerce.domain.auth.dto.response.SignInResponseDto;
+import com.devsm.ecommerce.domain.auth.dto.response.SignInResponse;
 import com.devsm.ecommerce.domain.auth.service.AuthService;
 import com.devsm.ecommerce.domain.auth.dto.request.SignUpRequestDto;
-import com.devsm.ecommerce.domain.auth.dto.response.SignUpResponseDto;
+import com.devsm.ecommerce.global.response.ResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +23,13 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<? super SignUpResponseDto> singUp(@RequestBody @Valid SignUpRequestDto dto){
-        return authService.signUp(dto);
+    public ResponseEntity<ResponseDto<Long>> singUp(@RequestBody @Valid SignUpRequestDto dto){
+        ResponseDto<Long> response = authService.signUp(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     @PostMapping("/sign-in")
-    public ResponseEntity<? super SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto dto){
-        return authService.signIn(dto);
+    public ResponseEntity<ResponseDto<SignInResponse>> signIn(@RequestBody @Valid SignInRequestDto dto){
+        ResponseDto<SignInResponse> response = authService.signIn(dto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
