@@ -32,6 +32,9 @@ public class User extends BaseEntity {
     @Convert(converter = CryptoConverter.class)
     private String address;
 
+    @Convert(converter = CryptoConverter.class)
+    private String uuid;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
