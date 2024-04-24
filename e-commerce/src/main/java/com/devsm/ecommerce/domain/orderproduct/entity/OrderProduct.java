@@ -1,4 +1,4 @@
-package com.devsm.ecommerce.domain.product.entity;
+package com.devsm.ecommerce.domain.orderproduct.entity;
 
 import com.devsm.ecommerce.global.BaseEntity;
 import jakarta.persistence.Entity;
@@ -6,26 +6,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
 @Getter
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public class Product extends BaseEntity {
-
+public class OrderProduct extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String productName;
-
-    private Long price;
-
-    private String content;
-
-    private Long stock;
+    private Long orderId;
+    private Long productId;
+    private Long quantity;
 
 }
