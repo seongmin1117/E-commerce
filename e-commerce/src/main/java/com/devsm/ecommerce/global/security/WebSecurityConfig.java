@@ -33,7 +33,7 @@ public class WebSecurityConfig {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-
+        System.out.println(httpSecurity);
         httpSecurity
                 //cors 허용
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -51,13 +51,10 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 상태 유지 X
                 //경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/auth/**", "/").permitAll() // 회원가입,로그인은 모두
-                        .requestMatchers("/api/users/**").hasRole("USER") // 유저 페이지는 유저만
+                        .requestMatchers("/api/auth/**", "/","/api/products/**").permitAll() // 회원가입,로그인은 모두
+                        .requestMatchers("/api/users/**","/api/orders/**").hasRole("USER") // 유저 페이지는 유저만
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // 나중에 생길 관리자를 위해 ,,
                         .anyRequest().authenticated()) // 나머지 모든 요청은 인증된 사용자
-                // (인가 실패) 예외 발생시 커스텀한 값 반환
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(new FailedAuthenticationEntryPoint()))
                 // 필터 등록
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

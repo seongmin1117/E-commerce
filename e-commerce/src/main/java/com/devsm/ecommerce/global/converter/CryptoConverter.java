@@ -14,7 +14,6 @@ public class CryptoConverter implements AttributeConverter<String,String>{
     @Override
     public String convertToDatabaseColumn(String plainText) {
         if (plainText == null) return null;
-
         try {
             return aesUtil.aesEncrypt(plainText);
         } catch (Exception e) {
@@ -26,7 +25,6 @@ public class CryptoConverter implements AttributeConverter<String,String>{
     public String convertToEntityAttribute(String encryptedText) {
         if (encryptedText == null) return null;
         try {
-            System.out.println(encryptedText);
             return aesUtil.aesDecrypt(encryptedText);
         } catch (Exception e) {
             throw new RuntimeException(e);

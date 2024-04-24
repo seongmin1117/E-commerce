@@ -11,6 +11,7 @@ public interface ResponseMessage {
     String NOT_EXISTED_USER = "This user does not exist"; // 존재하지 않는 유저
     String NOT_EXISTED_PRODUCT = "This product does not exist"; // 존재하지 않는 상품
     String NOT_EXISTED_ORDER = "This order does not exist"; // 존재하지 않는 주문
+    String NOT_EXISTED = "존재하지 않습니다."; // 존재하지 않을 때
 
     // HTTP Status 401
     String SIGN_IN_FAILED = "Login information mismatch"; // 로그인 실패

@@ -13,6 +13,7 @@ public interface ResponseCode {
     String NOT_EXISTED_USER = "NU"; // 존재하지 않는 유저
     String NOT_EXISTED_PRODUCT = "NP"; // 존재하지 않는 상품
     String NOT_EXISTED_ORDER = "NO"; // 존재하지 않는 주문
+    String NOT_EXISTED = "NE"; // 존재하지 않을 때
 
     // HTTP Status 401
     String SIGN_IN_FAILED = "SF"; // 로그인 실패
