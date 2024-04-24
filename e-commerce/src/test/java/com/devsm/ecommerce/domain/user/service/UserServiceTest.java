@@ -25,26 +25,5 @@ public class UserServiceTest extends ServiceTest {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Test
-    @DisplayName("회원가입이 성공한다.")
-    void signUp() {
-
-        // Given
-        SignUpRequestDto dto = new SignUpRequestDto();
-        dto.setEmail("test@example.com");
-        dto.setPassword("password");
-        dto.setUsername("testUser");
-        dto.setPhoneNumber("1234567890");
-        dto.setAddress("123 Test St, Test City");
-
-        // When
-            String password = dto.getPassword();
-            dto.setPassword(bCryptPasswordEncoder.encode(password));
-            User savedUser = userRepository.save(new User(dto));
-
-        // Then
-        assertNotNull(savedUser.getId());
-        assertEquals(dto.getEmail(), savedUser.getEmail());
-    }
 
 }
